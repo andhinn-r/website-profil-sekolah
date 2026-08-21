@@ -21,12 +21,12 @@ export default function Navbar() {
           {/* Navigasi Utama (desktop) */}
           <nav aria-label="Navigasi utama" className="hidden md:block">
             <ul className="flex items-center gap-6 text-white font-medium">
-              <li><Link href="#profil" className="hover:text-white/80 transition">Profil</Link></li>
+              <li><Link href="#profil" className="hover:text-white/80 transition">Beranda</Link></li>
               <li><Link href="#tentang" className="hover:text-white/80 transition">Tentang</Link></li>
               <li><Link href="#program" className="hover:text-white/80 transition">Program</Link></li>
+              <li><Link href="#prestasi" className="hover:text-white/80 transition">Prestasi</Link></li>
               <li><Link href="#galeri" className="hover:text-white/80 transition">Galeri</Link></li>
               <li><Link href="#berita" className="hover:text-white/80 transition">Berita</Link></li>
-              <li><Link href="#prestasi" className="hover:text-white/80 transition">Prestasi</Link></li>
             </ul>
           </nav>
 
@@ -35,7 +35,7 @@ export default function Navbar() {
             href="/sign-up"
             className="bg-yellow-500 text-black px-6 py-2 rounded-full font-bold hover:bg-yellow-400 transition shadow-md flex items-center gap-1 whitespace-nowrap"
           >
-            Daftar Sekarang <span className="text-lg">➔</span>
+            Daftar Segera <span className="text-lg">➔</span>
           </Link>
 
           {/* Hamburger (mobile) */}
@@ -55,19 +55,19 @@ export default function Navbar() {
       {isOpen && (
         <nav className="md:hidden mt-4 border-t border-white/20">
           <ul className="flex flex-col items-center gap-4 py-6 text-white font-medium">
-            <li><Link href="#profil" onClick={() => setIsOpen(false)} className="hover:text-white/80">Profil</Link></li>
+            <li><Link href="#profil" onClick={() => setIsOpen(false)} className="hover:text-white/80">Beranda</Link></li>
             <li><Link href="#tentang" onClick={() => setIsOpen(false)} className="hover:text-white/80">Tentang</Link></li>
             <li><Link href="#program" onClick={() => setIsOpen(false)} className="hover:text-white/80">Program</Link></li>
+            <li><Link href="#prestasi" onClick={() => setIsOpen(false)} className="hover:text-white/80">Prestasi</Link></li>
             <li><Link href="#galeri" onClick={() => setIsOpen(false)} className="hover:text-white/80">Galeri</Link></li>
             <li><Link href="#berita" onClick={() => setIsOpen(false)} className="hover:text-white/80">Berita</Link></li>
-            <li><Link href="#prestasi" onClick={() => setIsOpen(false)} className="hover:text-white/80">Prestasi</Link></li>
             <li>
               <Link
                 href="/sign-up"
                 onClick={() => setIsOpen(false)}
                 className="bg-yellow-500 text-black px-8 py-2 rounded-full font-bold hover:bg-yellow-400 transition"
               >
-                Daftar Sekarang
+                Daftar Segera
               </Link>
             </li>
           </ul>
