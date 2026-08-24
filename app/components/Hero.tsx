@@ -1,32 +1,26 @@
-import Image from "next/image";
+"use client";
 
-/* 6 foto sekolah yang disusun membentuk kipas di bagian bawah hero */
+import Image from "next/image";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
+
+/* 6 foto sekolah untuk carousel 3D di bagian bawah hero */
 const GALLERY_IMAGES = [
-  { src: "/images/hero/school_exterior.png", alt: "Gedung sekolah", rotate: 7, offset: 0 },
-  { src: "/images/hero/school_students.png", alt: "Siswa sekolah", rotate: 4.5, offset: 26 },
-  { src: "/images/hero/school_library.png", alt: "Perpustakaan", rotate: 2, offset: 44 },
-  { src: "/images/hero/school_lab.png", alt: "Laboratorium", rotate: -2, offset: 44 },
-  { src: "/images/hero/school_workshop.png", alt: "Workshop", rotate: -4.5, offset: 26 },
-  { src: "/images/hero/school_sports.png", alt: "Olahraga", rotate: -7, offset: 0 },
+  { src: "/images/hero/school_exterior.png", alt: "Gedung sekolah" },
+  { src: "/images/hero/school_students.png", alt: "Siswa sekolah" },
+  { src: "/images/hero/school_library.png", alt: "Perpustakaan" },
+  { src: "/images/hero/school_lab.png", alt: "Laboratorium" },
+  { src: "/images/hero/school_workshop.png", alt: "Workshop" },
+  { src: "/images/hero/school_sports.png", alt: "Olahraga" },
 ];
 
-function ArrowUpRightIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M7 17 17 7" />
-      <path d="M8 7h9v9" />
-    </svg>
-  );
-}
+const COUNT = GALLERY_IMAGES.length;
+/* kecepatan aliran: 0.25 slot/detik = ganti 1 foto tiap 4 detik */
+const SPEED = 0.25;
 
 function CameraIcon({ className }: { className?: string }) {
   return (
@@ -48,6 +42,76 @@ function CameraIcon({ className }: { className?: string }) {
 }
 
 export default function Hero() {
+  const [pos, setPos] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [spacing, setSpacing] = useState(380);
+
+  const posRef = useRef(0);
+  const draggingRef = useRef(false);
+  const targetRef = useRef<number | null>(null);
+  const startPosRef = useRef(0);
+  const startXRef = useRef(0);
+
+  useEffect(() => {
+    const update = () => setSpacing(window.innerWidth < 768 ? 240 : 380);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  /* aliran kontinu ke kanan; tween halus ke target (klik dot / settle setelah drag) */
+  useEffect(() => {
+    let raf = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      if (!draggingRef.current) {
+        if (targetRef.current !== null) {
+          const diff = targetRef.current - posRef.current;
+          if (Math.abs(diff) < 0.002) {
+            posRef.current = targetRef.current;
+            targetRef.current = null;
+          } else {
+            posRef.current += diff * Math.min(1, dt * 5);
+          }
+        } else {
+          posRef.current -= dt * SPEED;
+        }
+        setPos(posRef.current);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    draggingRef.current = true;
+    setDragging(true);
+    targetRef.current = null;
+    startPosRef.current = posRef.current;
+    startXRef.current = e.clientX;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    posRef.current =
+      startPosRef.current - (e.clientX - startXRef.current) / spacing;
+    setPos(posRef.current);
+  };
+
+  const endDrag = () => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    setDragging(false);
+    /* settle mulus ke foto terdekat, lalu aliran berlanjut */
+    targetRef.current = Math.round(posRef.current);
+  };
+
+  const activeIdx = ((Math.round(pos) % COUNT) + COUNT) % COUNT;
+
   return (
     <div className="min-h-screen bg-[#1b1e22] font-sans">
       <section className="relative overflow-hidden bg-[#1b1e22]">
@@ -63,75 +127,75 @@ export default function Hero() {
           </h1>
 
           <p className="mt-7 text-[17px] text-[#c9cdd2]">Akreditasi A+</p>
-
-          {/* CTA buttons */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-5">
-            <span className="relative inline-flex">
-              <span
-                aria-hidden="true"
-                className="absolute -top-2 left-1/2 h-4 w-24 -translate-x-1/2 rounded-[100%] bg-[#d9bc6a]"
-              />
-              <a
-                href="#"
-                className="relative flex items-center gap-2.5 bg-[#c8a23f] px-8 py-4 text-[#f5f1e6] transition-colors hover:bg-[#b8933a]"
-              >
-                <span className="font-display text-lg font-semibold tracking-wide">
-                  Button kiri
-                </span>
-                <ArrowUpRightIcon className="h-4 w-4" />
-              </a>
-            </span>
-            <span className="relative inline-flex">
-              <span
-                aria-hidden="true"
-                className="absolute -top-2 left-1/2 h-4 w-24 -translate-x-1/2 rounded-[100%] bg-[#a9b3bb]"
-              />
-              <a
-                href="#"
-                className="relative flex items-center gap-2.5 bg-[#7b8790] px-8 py-4 text-white transition-colors hover:bg-[#6d7982]"
-              >
-                <span className="font-display text-lg font-semibold tracking-wide">
-                  Button kanan
-                </span>
-                <ArrowUpRightIcon className="h-4 w-4" />
-              </a>
-            </span>
-          </div>
         </div>
 
-        {/* ================= Fan gallery (6 gambar) ================= */}
-        <div className="relative mt-2 pb-28 md:pb-32">
-          {/* Lengkungan krem di belakang foto */}
+        {/* ================= Carousel 3D (6 gambar) ================= */}
+        <div className="relative pb-14 pt-8">
           <div
-            aria-hidden="true"
-            className="absolute bottom-0 left-1/2 h-52 w-[180%] -translate-x-1/2 rounded-t-[100%] bg-[#f0efe5] md:h-60"
-          />
-
-          <div className="relative z-10 flex justify-center gap-4 md:gap-5">
-            {GALLERY_IMAGES.map((img) => (
-              <div
-                key={img.src}
-                className="w-40 shrink-0 md:w-56 xl:w-[270px]"
-                style={{
-                  transform: `translateY(${img.offset}px) rotate(${img.rotate}deg)`,
-                }}
-              >
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  width={540}
-                  height={720}
-                  className="h-[380px] w-full object-cover shadow-[0_25px_60px_rgba(0,0,0,0.45)] md:h-[440px]"
-                />
-              </div>
-            ))}
+            className={`relative mx-auto h-[400px] max-w-full select-none md:h-[500px] ${
+              dragging ? "cursor-grabbing" : "cursor-grab"
+            }`}
+            style={{ perspective: "1600px", touchAction: "pan-y" }}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerLeave={endDrag}
+            onPointerCancel={endDrag}
+          >
+            {GALLERY_IMAGES.map((img, i) => {
+              /* offset melingkar dari posisi kontinu: aliran searah tanpa mentok */
+              let o = (((i - pos) % COUNT) + COUNT) % COUNT;
+              if (o > COUNT / 2) o -= COUNT;
+              const abs = Math.abs(o);
+              /* cekung: kartu tengah paling jauh, makin ke samping makin dekat ke user */
+              const t = Math.min(abs, 3);
+              /* rotasi hanya di dekat tengah; kartu paling pinggir tetap lurus menghadap user */
+              const tilt = abs <= 1 ? abs : Math.max(0, 1 - (abs - 1) / 2);
+              const rot = -Math.sign(o) * 38 * tilt;
+              return (
+                <div
+                  key={img.src}
+                  className="absolute left-1/2 top-1/2 h-[320px] w-[230px] overflow-hidden rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.55)] md:h-[440px] md:w-[310px]"
+                  style={{
+                    transform: `translate(-50%, -50%) translateX(${o * spacing}px) translateZ(${t * 130}px) rotateY(${rot}deg)`,
+                    zIndex: 10 + Math.round(t * 10),
+                    opacity: abs <= 2 ? 1 - abs * 0.12 : Math.max(0, 3 - abs) * 0.76,
+                    filter: `brightness(${Math.max(0.4, 1 - abs * 0.22)})`,
+                  }}
+                >
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    sizes="(max-width: 768px) 230px, 310px"
+                    className="object-cover"
+                    draggable={false}
+                  />
+                </div>
+              );
+            })}
           </div>
 
           {/* Indikator carousel */}
-          <div className="absolute bottom-3 left-0 z-20 flex w-full items-center justify-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-[#c8a23f]" />
-            <span className="h-3 w-3 rounded-full border-2 border-[#c8a23f] bg-[#e6cd82]" />
-            <span className="h-2 w-2 rounded-full bg-[#c8a23f]" />
+          <div className="relative z-50 mt-8 flex justify-center gap-2.5">
+            {GALLERY_IMAGES.map((img, i) => (
+              <button
+                key={img.src}
+                type="button"
+                aria-label={`Ke foto ${i + 1}`}
+                onClick={() => {
+                  let d = i - activeIdx;
+                  if (d > COUNT / 2) d -= COUNT;
+                  if (d < -COUNT / 2) d += COUNT;
+                  targetRef.current = posRef.current + d;
+                }}
+                className={`rounded-full transition-all ${
+                  i === activeIdx
+                    ? "h-3 w-3 bg-[#c8a23f]"
+                    : "h-2 w-2 translate-y-0.5 bg-[#c8a23f]/40 hover:bg-[#c8a23f]/70"
+                }`}
+              />
+            ))}
           </div>
         </div>
       </section>
