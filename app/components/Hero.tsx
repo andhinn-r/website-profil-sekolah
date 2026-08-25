@@ -1,25 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type PointerEvent as ReactPointerEvent,
-} from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { supabase } from "@/lib/supabase";
 
-/* 6 foto sekolah untuk carousel 3D di bagian bawah hero */
-const GALLERY_IMAGES = [
-  { src: "/images/hero/school_exterior.png", alt: "Gedung sekolah" },
-  { src: "/images/hero/school_students.png", alt: "Siswa sekolah" },
-  { src: "/images/hero/school_library.png", alt: "Perpustakaan" },
-  { src: "/images/hero/school_lab.png", alt: "Laboratorium" },
-  { src: "/images/hero/school_workshop.png", alt: "Workshop" },
-  { src: "/images/hero/school_sports.png", alt: "Olahraga" },
-];
+interface HeroImage {
+  id: number;
+  src: string; 
+  alt: string;
+}
 
-const COUNT = GALLERY_IMAGES.length;
-/* kecepatan aliran: 0.25 slot/detik = ganti 1 foto tiap 4 detik */
 const SPEED = 0.25;
 
 function CameraIcon({ className }: { className?: string }) {
@@ -42,6 +32,9 @@ function CameraIcon({ className }: { className?: string }) {
 }
 
 export default function Hero() {
+  const [images, setImages] = useState<HeroImage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [pos, setPos] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [spacing, setSpacing] = useState(380);
@@ -53,13 +46,48 @@ export default function Hero() {
   const startXRef = useRef(0);
 
   useEffect(() => {
+    async function fetchGallery() {
+      try {
+        const { data, error } = await supabase
+          .from('jurusan')
+          .select('id, image_url, alt_text')
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        if (data) {
+          const formatted = data
+            .filter(item => item.image_url && item.image_url.trim() !== '') // Filter data yang URL-nya kosong
+            .map(item => ({
+              id: item.id,
+              src: item.image_url,
+              alt: item.alt_text || 'Foto Sekolah'
+            }));
+          setImages(formatted);
+        }
+      } catch (err: any) {
+        console.error("=== ERROR SUPABASE ===");
+        console.error("Message:", err.message);
+        console.error("Details:", err.details);
+        console.error("Hint:", err.hint);
+        console.error("Full Error:", JSON.stringify(err, null, 2));
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchGallery();
+  }, []);
+
+  // 2. HANDLE RESIZE LAYOUT
+  useEffect(() => {
     const update = () => setSpacing(window.innerWidth < 768 ? 240 : 380);
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  /* aliran kontinu ke kanan; tween halus ke target (klik dot / settle setelah drag) */
+  // 3. ANIMASI CAROUSEL
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
@@ -97,8 +125,7 @@ export default function Hero() {
 
   const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (!draggingRef.current) return;
-    posRef.current =
-      startPosRef.current - (e.clientX - startXRef.current) / spacing;
+    posRef.current = startPosRef.current - (e.clientX - startXRef.current) / spacing;
     setPos(posRef.current);
   };
 
@@ -106,11 +133,27 @@ export default function Hero() {
     if (!draggingRef.current) return;
     draggingRef.current = false;
     setDragging(false);
-    /* settle mulus ke foto terdekat, lalu aliran berlanjut */
     targetRef.current = Math.round(posRef.current);
   };
 
-  const activeIdx = ((Math.round(pos) % COUNT) + COUNT) % COUNT;
+  const COUNT = images.length;
+  const activeIdx = COUNT > 0 ? ((Math.round(pos) % COUNT) + COUNT) % COUNT : 0;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#1b1e22] flex items-center justify-center text-[#c9cdd2]">
+        Memuat galeri...
+      </div>
+    );
+  }
+
+  if (COUNT === 0) {
+    return (
+      <div className="min-h-screen bg-[#1b1e22] flex items-center justify-center text-[#c9cdd2]">
+        Belum ada foto yang tersedia.
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#1b1e22] font-sans">
@@ -129,12 +172,11 @@ export default function Hero() {
           <p className="mt-7 text-[17px] text-[#c9cdd2]">Akreditasi A+</p>
         </div>
 
-        {/* ================= Carousel 3D (6 gambar) ================= */}
+        {/* ================= Carousel 3D ================= */}
         <div className="relative pb-14 pt-8">
           <div
-            className={`relative mx-auto h-[400px] max-w-full select-none md:h-[500px] ${
-              dragging ? "cursor-grabbing" : "cursor-grab"
-            }`}
+            className={`relative mx-auto h-[400px] max-w-full select-none md:h-[500px] ${dragging ? "cursor-grabbing" : "cursor-grab"
+              }`}
             style={{ perspective: "1600px", touchAction: "pan-y" }}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
@@ -142,19 +184,17 @@ export default function Hero() {
             onPointerLeave={endDrag}
             onPointerCancel={endDrag}
           >
-            {GALLERY_IMAGES.map((img, i) => {
-              /* offset melingkar dari posisi kontinu: aliran searah tanpa mentok */
+            {images.map((img, i) => {
               let o = (((i - pos) % COUNT) + COUNT) % COUNT;
               if (o > COUNT / 2) o -= COUNT;
               const abs = Math.abs(o);
-              /* cekung: kartu tengah paling jauh, makin ke samping makin dekat ke user */
               const t = Math.min(abs, 3);
-              /* rotasi hanya di dekat tengah; kartu paling pinggir tetap lurus menghadap user */
               const tilt = abs <= 1 ? abs : Math.max(0, 1 - (abs - 1) / 2);
               const rot = -Math.sign(o) * 38 * tilt;
+
               return (
                 <div
-                  key={img.src}
+                  key={img.id} 
                   className="absolute left-1/2 top-1/2 h-[320px] w-[230px] overflow-hidden rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.55)] md:h-[440px] md:w-[310px]"
                   style={{
                     transform: `translate(-50%, -50%) translateX(${o * spacing}px) translateZ(${t * 130}px) rotateY(${rot}deg)`,
@@ -178,9 +218,9 @@ export default function Hero() {
 
           {/* Indikator carousel */}
           <div className="relative z-50 mt-8 flex justify-center gap-2.5">
-            {GALLERY_IMAGES.map((img, i) => (
+            {images.map((img, i) => (
               <button
-                key={img.src}
+                key={img.id}
                 type="button"
                 aria-label={`Ke foto ${i + 1}`}
                 onClick={() => {
@@ -189,11 +229,10 @@ export default function Hero() {
                   if (d < -COUNT / 2) d += COUNT;
                   targetRef.current = posRef.current + d;
                 }}
-                className={`rounded-full transition-all ${
-                  i === activeIdx
-                    ? "h-3 w-3 bg-[#c8a23f]"
-                    : "h-2 w-2 translate-y-0.5 bg-[#c8a23f]/40 hover:bg-[#c8a23f]/70"
-                }`}
+                className={`rounded-full transition-all ${i === activeIdx
+                  ? "h-3 w-3 bg-[#c8a23f]"
+                  : "h-2 w-2 translate-y-0.5 bg-[#c8a23f]/40 hover:bg-[#c8a23f]/70"
+                  }`}
               />
             ))}
           </div>
