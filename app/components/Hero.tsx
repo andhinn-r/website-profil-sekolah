@@ -1,29 +1,24 @@
+// app/components/Hero.tsx
 "use client";
 
 import Image from "next/image";
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { supabase } from "@/lib/supabase";
 
 interface HeroImage {
-  id: number;
+  id: number | string; // Mendukung ID numerik atau string
   src: string; 
   alt: string;
+}
+
+interface HeroProps {
+  images: HeroImage[]; // Data diterima via props, tidak lagi di-fetch internal
 }
 
 const SPEED = 0.25;
 
 function CameraIcon({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.2l1.6-2.5h7.4L17.3 7h2.2A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5Z" />
       <circle cx="12" cy="13" r="3.5" />
       <path d="M17.5 5.5 18 4h1.5" />
@@ -31,10 +26,7 @@ function CameraIcon({ className }: { className?: string }) {
   );
 }
 
-export default function Hero() {
-  const [images, setImages] = useState<HeroImage[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
+export default function Hero({ images }: HeroProps) {
   const [pos, setPos] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [spacing, setSpacing] = useState(380);
@@ -45,41 +37,7 @@ export default function Hero() {
   const startPosRef = useRef(0);
   const startXRef = useRef(0);
 
-  useEffect(() => {
-    async function fetchGallery() {
-      try {
-        const { data, error } = await supabase
-          .from('jurusan')
-          .select('id, image_url, alt_text')
-          .order('created_at', { ascending: true });
-
-        if (error) throw error;
-
-        if (data) {
-          const formatted = data
-            .filter(item => item.image_url && item.image_url.trim() !== '') // Filter data yang URL-nya kosong
-            .map(item => ({
-              id: item.id,
-              src: item.image_url,
-              alt: item.alt_text || 'Foto Sekolah'
-            }));
-          setImages(formatted);
-        }
-      } catch (err: any) {
-        console.error("=== ERROR SUPABASE ===");
-        console.error("Message:", err.message);
-        console.error("Details:", err.details);
-        console.error("Hint:", err.hint);
-        console.error("Full Error:", JSON.stringify(err, null, 2));
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchGallery();
-  }, []);
-
-  // 2. HANDLE RESIZE LAYOUT
+  // HANDLE RESIZE LAYOUT
   useEffect(() => {
     const update = () => setSpacing(window.innerWidth < 768 ? 240 : 380);
     update();
@@ -87,7 +45,7 @@ export default function Hero() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // 3. ANIMASI CAROUSEL
+  // ANIMASI CAROUSEL
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
@@ -139,14 +97,7 @@ export default function Hero() {
   const COUNT = images.length;
   const activeIdx = COUNT > 0 ? ((Math.round(pos) % COUNT) + COUNT) % COUNT : 0;
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#1b1e22] flex items-center justify-center text-[#c9cdd2]">
-        Memuat galeri...
-      </div>
-    );
-  }
-
+  // Tampilkan pesan jika data kosong (bukan loading state)
   if (COUNT === 0) {
     return (
       <div className="min-h-screen bg-[#1b1e22] flex items-center justify-center text-[#c9cdd2]">
@@ -158,25 +109,22 @@ export default function Hero() {
   return (
     <div className="min-h-screen bg-[#1b1e22] font-sans">
       <section className="relative overflow-hidden bg-[#1b1e22]">
-        {/* ================= Headline ================= */}
+        {/* Headline */}
         <div className="mx-auto max-w-5xl px-6 pb-16 pt-20 text-center md:pt-24">
           <p className="flex flex-wrap items-center justify-center gap-2.5 text-[17px] font-medium text-white">
             <CameraIcon className="h-6 w-6 text-[#c8a23f]" />
             slogan TB
           </p>
-
           <h1 className="font-display mt-7 text-5xl font-semibold leading-[1.08] text-[#f2f1ed] md:text-6xl xl:text-[76px]">
             SMK Taruna Bhakti
           </h1>
-
           <p className="mt-7 text-[17px] text-[#c9cdd2]">Akreditasi A+</p>
         </div>
 
-        {/* ================= Carousel 3D ================= */}
+        {/* Carousel 3D */}
         <div className="relative pb-14 pt-8">
           <div
-            className={`relative mx-auto h-[400px] max-w-full select-none md:h-[500px] ${dragging ? "cursor-grabbing" : "cursor-grab"
-              }`}
+            className={`relative mx-auto h-[400px] max-w-full select-none md:h-[500px] ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
             style={{ perspective: "1600px", touchAction: "pan-y" }}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
