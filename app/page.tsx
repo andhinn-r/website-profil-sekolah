@@ -1,5 +1,5 @@
-// app/page.tsx
 import Hero from "@/app/components/Hero";
+import About from "@/app/components/About";
 import SekolahMap from "@/app/components/Maps";
 import { fetchData } from "@/lib/supabase"; 
 
@@ -34,6 +34,7 @@ export default async function Home() {
   return (
     <main className="w-full min-h-screen bg-[#1b1e22]">
       <Hero images={heroImages} />
+      <About />
       
       <section className="px-4 py-12 md:px-8 max-w-6xl mx-auto">
         <div className="mb-6 text-center">
