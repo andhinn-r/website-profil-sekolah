@@ -21,8 +21,9 @@ const cormorantSC = Cormorant_SC({
 });
 
 export const metadata: Metadata = {
-  title: "SMK Nusa Karya",
-  description: "Website resmi SMK Nusa Karya - Membangun Generasi Kreatif, Kompeten, dan Berkarakter",
+  title: "SMK Taruna Bhakti",
+  description:
+    "Website resmi SMK Taruna Bhakti Depok - Membangun Generasi Kreatif, Kompeten, dan Berkarakter",
 };
 
 export default function RootLayout({
@@ -32,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="id"
       className={`${geistSans.variable} ${geistMono.variable} ${cormorantSC.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

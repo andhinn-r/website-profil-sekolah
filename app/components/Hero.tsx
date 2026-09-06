@@ -1,29 +1,24 @@
+// app/components/Hero.tsx
 "use client";
 
 import Image from "next/image";
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { supabase } from "@/lib/supabase";
 
 interface HeroImage {
-  id: number;
+  id: number | string; // Mendukung ID numerik atau string
   src: string; 
   alt: string;
+}
+
+interface HeroProps {
+  images: HeroImage[]; // Data diterima via props, tidak lagi di-fetch internal
 }
 
 const SPEED = 0.25;
 
 function CameraIcon({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.2l1.6-2.5h7.4L17.3 7h2.2A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5Z" />
       <circle cx="12" cy="13" r="3.5" />
       <path d="M17.5 5.5 18 4h1.5" />
@@ -31,10 +26,7 @@ function CameraIcon({ className }: { className?: string }) {
   );
 }
 
-export default function Hero() {
-  const [images, setImages] = useState<HeroImage[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
+export default function Hero({ images }: HeroProps) {
   const [pos, setPos] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [spacing, setSpacing] = useState(320);
@@ -87,7 +79,7 @@ export default function Hero() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // 3. ANIMASI CAROUSEL
+  // ANIMASI CAROUSEL
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
