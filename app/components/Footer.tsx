@@ -42,8 +42,6 @@ export default function Footer() {
             <ul className="space-y-2 text-gray-300 text-sm">
               <li><a href="#profil" className="hover:text-white transition">Profil Sekolah</a></li>
               <li><a href="#fasilitas" className="hover:text-white transition">Fasilitas</a></li>
-              <li><a href="#ekskul" className="hover:text-white transition">Ekstrakurikuler</a></li>
-              <li><a href="#berita" className="hover:text-white transition">Berita &amp; Pengumuman</a></li>
               <li><a href="#ppdb" className="hover:text-white transition">Informasi PPDB</a></li>
             </ul>
           </div>
@@ -52,12 +50,10 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-lg mb-4">PROGRAM KEAHLIAN</h4>
             <ul className="space-y-2 text-gray-300 text-sm">
-              <li>TJKT (Teknik Jaringan Komputer &amp; Telekomunikasi)</li>
-              <li>PPLG (Pengembangan Perangkat Lunak &amp; Gim)</li>
-              <li>Broadcasting &amp; Perfilman</li>
-              <li>Animasi</li>
-              <li>Teknik Elektronika</li>
-              <li>DKV</li>
+              <li>Jurusan</li>
+              <li>Ekstrakurikuler</li>
+              <li>Prestasi</li>
+              <li>Berita</li>
             </ul>
           </div>
 
@@ -65,10 +61,6 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-lg mb-4">KONTAK KAMI</h4>
             <address className="not-italic text-gray-300 space-y-2 text-sm">
-              <p>Jl. Raya Pekapuran, Kel. Curug,</p>
-              <p>Kec. Cimanggis, Kota Depok,</p>
-              <p>Jawa Barat 16953</p>
-              <p className="mt-2">📞 021-87743374</p>
               <p>
                 <a href="mailto:taruna@smktarunabhakti.net" className="hover:text-white transition">
                   taruna@smktarunabhakti.net
@@ -79,20 +71,10 @@ export default function Footer() {
                   www.smktarunabhakti.net
                 </a>
               </p>
+              <p className="mt-2">📞 021-87743374</p>
+              <p className="font-medium text-white">Senin – Jumat: 07:00 – 16:00 WIB</p>
+              <p className="font-medium text-white">Sabtu: 07:00 – 12:00 WIB</p>
             </address>
-          </div>
-
-          {/* Jam Kerja */}
-          <div>
-            <h4 className="font-semibold text-lg mb-4">JAM OPERASIONAL</h4>
-            <div className="text-gray-300 space-y-2 text-sm">
-              <p>Senin – Jumat</p>
-              <p className="font-medium text-white">07:00 – 16:00 WIB</p>
-              <p className="mt-2">Sabtu</p>
-              <p className="font-medium text-white">07:00 – 12:00 WIB</p>
-              <p className="mt-2">Minggu</p>
-              <p>Libur</p>
-            </div>
           </div>
         </div>
 
