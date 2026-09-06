@@ -34,22 +34,31 @@ export default async function Home() {
     })) || [];
 
   return (
-    <main className="w-full min-h-screen bg-[#1b1e22]">
+    <main className="w-full min-h-screen bg-slate-950">
       <Hero images={heroImages} />
       <About />
       
-      <section className="px-4 py-12 md:px-8 max-w-6xl mx-auto">
-        <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-[#f2f1ed] mb-2">Lokasi Kami</h2>
-          <p className="text-[#c9cdd2]">{LOKASI_SEKOLAH.alamat}</p>
+      <section id="lokasi" className="bg-slate-950 py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-sky-400 bg-sky-950/70 border border-sky-800/60 mb-3">
+              Letak Strategis Kampus
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-2">
+              Lokasi Kami
+            </h2>
+            <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
+              {LOKASI_SEKOLAH.alamat}
+            </p>
+          </div>
+          
+          <SekolahMap 
+            lat={LOKASI_SEKOLAH.lat}
+            lng={LOKASI_SEKOLAH.lng}
+            nama={LOKASI_SEKOLAH.nama}
+            alamat={LOKASI_SEKOLAH.alamat}
+          />
         </div>
-        
-        <SekolahMap 
-          lat={LOKASI_SEKOLAH.lat}
-          lng={LOKASI_SEKOLAH.lng}
-          nama={LOKASI_SEKOLAH.nama}
-          alamat={LOKASI_SEKOLAH.alamat}
-        />
       </section>
       <Highlight />
       <Prestasi />

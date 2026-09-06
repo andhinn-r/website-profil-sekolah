@@ -65,11 +65,13 @@ export default function SekolahMap({ lat, lng, nama, alamat }: SekolahMapProps) 
   }, []);
 
   if (!isClient) {
-    return <div className="h-[400px] w-full rounded-lg bg-gray-800 animate-pulse" />;
+    return (
+      <div className="h-[420px] w-full rounded-2xl bg-slate-900 border border-slate-800 animate-pulse" />
+    );
   }
 
   return (
-    <div className="h-[400px] w-full rounded-lg overflow-hidden border border-gray-700 shadow-sm relative z-0">
+    <div className="h-[420px] w-full rounded-2xl overflow-hidden border border-slate-800 shadow-lg relative z-0">
       <MapContainer center={[lat, lng]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -77,9 +79,9 @@ export default function SekolahMap({ lat, lng, nama, alamat }: SekolahMapProps) 
         />
         <Marker position={[lat, lng]}>
           <Popup>
-            <div className="text-center min-w-[150px]">
-              <strong className="block text-base mb-1">{nama}</strong>
-              {alamat && <span className="text-xs text-gray-600 leading-tight block">{alamat}</span>}
+            <div className="text-center min-w-[160px] rounded-lg">
+              <strong className="block text-sm mb-1 text-slate-900">{nama}</strong>
+              {alamat && <span className="text-xs text-slate-600 leading-tight block">{alamat}</span>}
             </div>
           </Popup>
         </Marker>
