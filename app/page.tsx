@@ -1,6 +1,8 @@
 import Hero from "@/app/components/Hero";
 import About from "@/app/components/About";
 import SekolahMap from "@/app/components/Maps";
+import Highlight from "@/app/components/Highlight";
+import Prestasi from "@/app/components/Prestasi";
 import { fetchData } from "@/lib/supabase"; 
 
 interface JurusanRaw {
@@ -49,6 +51,8 @@ export default async function Home() {
           alamat={LOKASI_SEKOLAH.alamat}
         />
       </section>
+      <Highlight />
+      <Prestasi />
     </main>
   );
 }
