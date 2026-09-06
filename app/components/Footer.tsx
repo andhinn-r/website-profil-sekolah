@@ -48,7 +48,7 @@ export default function Footer() {
 
           {/* Program Keahlian */}
           <div>
-            <h4 className="font-semibold text-lg mb-4">Informasi</h4>
+            <h4 className="font-semibold text-lg mb-4">PROGRAM KEAHLIAN</h4>
             <ul className="space-y-2 text-gray-300 text-sm">
               <li>Jurusan</li>
               <li>Ekstrakurikuler</li>
