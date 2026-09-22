@@ -1,4 +1,4 @@
-# 🏫 Website Sekolah
+#  Website Sekolah
 
 <div align="center">
 
@@ -13,13 +13,13 @@
 
 ---
 
-## 📖 Deskripsi
+##  Deskripsi
 
 **Website Sekolah** merupakan aplikasi berbasis website yang dibuat untuk menyediakan informasi mengenai sekolah secara lebih **mudah**, **cepat**, dan **terstruktur**. Website ini dirancang agar pengguna dapat mengakses berbagai informasi sekolah melalui satu platform terpadu.
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+##  Teknologi yang Digunakan
 
 - **Next.js** — Framework React untuk pengembangan frontend dan backend
 - **Supabase** — Database dan backend service
@@ -28,7 +28,7 @@
 
 ---
 
-## 👥 Pembagian Tugas
+##  Pembagian Tugas
 
 | No | Nama | Peran | Tanggung Jawab |
 |:--:|------|-------|----------------|
@@ -39,7 +39,7 @@
 
 ---
 
-## 🚀 Cara Menjalankan Project
+##  Cara Menjalankan Project
 
 Ikuti langkah-langkah berikut untuk menjalankan project di lingkungan lokal Anda.
 
@@ -92,7 +92,7 @@ http://localhost:3000
 
 ---
 
-## 🎨 Link Figma
+##  Link Figma
 
 <div align="center">
 
@@ -102,7 +102,7 @@ http://localhost:3000
 
 ---
 
-## 📸 Screenshot Tampilan Aplikasi
+##  Screenshot Tampilan Aplikasi
 
 <div align="center">
 
